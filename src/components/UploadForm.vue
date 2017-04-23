@@ -16,6 +16,8 @@
 </template>
 
 <script>
+  import axios from 'axios'
+
   export default {
     data () {
       return {
@@ -32,10 +34,54 @@
       },
       drop (e) {
         this.leave()
-        console.log(e.dataTransfer.files)
+        this.addFiles(e.dataTransfer.files)
       },
       select (e) {
-          console.log(this.$refs.input.files)
+        this.addFiles(this.$refs.input.files)
+      },
+      addFiles(files) {
+        let i, file
+
+        for (i = 0; i < files.length; i++) {
+          file = files[i]
+
+          this.storeMeta(file).then(fileObject => {
+            console.log(fileObject.id)
+          }, fileObject => {
+            console.log(fileObject.id)
+          })
+        }
+      },
+      storeMeta(file) {
+        let fileObject = this.generateFileObject(file)
+
+        return new Promise((resolve, reject) => {
+          axios.post('http://fileupload/store.php/', {
+            name: file.name
+          }).then(response => {
+            fileObject.id = response.data.data.id
+            resolve(fileObject)
+          }, () => {
+            reject(fileObject)
+          })
+        })
+      },
+      generateFileObject(file) {
+        let fileObjectIndex = this.files.push({
+            id: null,
+            file: file,
+            progress: 0,
+            failed: false,
+            loadedBytes: 0,
+            totalBytes: 0,
+            timeStarted: (new Date).getTime(),
+            secondsRemaining: 0,
+            finished: false,
+            cancelled: false,
+            xhr: null
+          }) - 1
+
+        return this.files[fileObjectIndex]
       }
     }
   }
