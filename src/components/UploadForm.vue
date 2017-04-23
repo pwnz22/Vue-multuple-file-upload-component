@@ -1,6 +1,14 @@
 <template>
-  <div class="dragndrop">
-    <input type="file" name="files[]" id="file" class="dragndrop__input" multiple>
+  <div class="dragndrop"
+       @dragover.prevent="enter"
+       @dragenter.prevent="enter"
+       @dragleave.prevent="leave"
+       @dragend.prevent="leave"
+       @drop.prevent="drop"
+       :class="{ 'dragndrop--dragged': isDraggedOver }"
+  >
+    {{ isDraggedOver }}
+    <input type="file" name="files[]" id="file" class="dragndrop__input" @change="select" ref="input" multiple>
     <label for="file" class="dragndrop__header dragndrop__header--compact">
       <strong>Drap files here</strong> or click to select files
     </label>
@@ -8,7 +16,29 @@
 </template>
 
 <script>
-  export default {}
+  export default {
+    data () {
+      return {
+        files: [],
+        isDraggedOver: false
+      }
+    },
+    methods: {
+      enter () {
+        this.isDraggedOver = true
+      },
+      leave () {
+        this.isDraggedOver = false
+      },
+      drop (e) {
+        this.leave()
+        console.log(e.dataTransfer.files)
+      },
+      select (e) {
+          console.log(this.$refs.input.files)
+      }
+    }
+  }
 </script>
 
 <style lang="scss" scoped>
@@ -20,6 +50,10 @@
     background-color: #f8f8f8;
     position: relative;
     border: 3px dashed rgba(0, 0, 0, .2);
+
+    &--dragged {
+      border-color: #333;
+    }
 
     &__input {
       display: none;
