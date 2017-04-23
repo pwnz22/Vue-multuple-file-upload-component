@@ -7,18 +7,22 @@
          @drop.prevent="drop"
          :class="{ 'dragndrop--dragged': isDraggedOver }"
     >
-        {{ isDraggedOver }}
         <input type="file" name="files[]" id="file" class="dragndrop__input" @change="select" ref="input" multiple>
-        <label for="file" class="dragndrop__header dragndrop__header--compact">
+
+        <label for="file" class="dragndrop__header" :class="{ 'dragndrop__header--compact': files.length >= 1 }">
             <strong>Drap files here</strong> or click to select files
         </label>
+
+        <uploads :files="files"></uploads>
     </div>
 </template>
 
 <script>
     import axios from 'axios'
+    import Uploads from './Uploads.vue'
 
     export default {
+        components: {Uploads},
         data () {
             return {
                 files: [],
@@ -55,7 +59,9 @@
             storeMeta(file) {
                 let fileObject = this.generateFileObject(file)
                 this.upload(fileObject)
+
                 return new Promise((resolve, reject) => {
+                    console.log('file', file.name)
                     axios.post('http://fileupload/store.php/', {
                         name: file.name
                     }).then(response => {
@@ -72,7 +78,7 @@
                 form.append('file', fileObject.file)
                 form.append('id', fileObject.id)
 
-                axios.post('http://fileupload/store.php/', form, {
+                axios.post('http://fileupload/upload.php', form, {
                     before: (xhr) => {
                         fileObject.xhr = xhr
                     },
@@ -82,9 +88,7 @@
                     }
                 }).then(response => {
                     console.log('finished')
-                    // emit finished
                 }, () => {
-                    // emit failed
                 })
             },
             generateFileObject(file) {
