@@ -20,6 +20,7 @@
 <script>
     import axios from 'axios'
     import Uploads from './Uploads.vue'
+    import eventHub from '../events'
 
     export default {
         components: {Uploads},
@@ -83,12 +84,12 @@
                         fileObject.xhr = xhr
                     },
                     onUploadProgress: (e) => {
-                        // emit progress
-                        console.log(e.loaded)
+                        eventHub.$emit('progress', fileObject, e)
                     }
-                }).then(response => {
-                    console.log('finished')
+                }).then(() => {
+                    eventHub.$emit('finished', fileObject)
                 }, () => {
+                    eventHub.$emit('failed', fileObject)
                 })
             },
             generateFileObject(file) {
