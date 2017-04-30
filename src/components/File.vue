@@ -11,14 +11,16 @@
                  :class="{ 'progress__fill--finished': file.finished, 'progress__fill--failed': file.failed || file.cancelled }"></div>
 
             <div class="progress__percentage">
-                <span v-if="file.failed">Failed</span>
+                <span v-if="file.failed && !file.cancelled">Failed</span>
                 <span v-if="file.finished">Complete</span>
-                <span v-if="file.cancelled">Complete</span>
+                <span v-if="file.cancelled">Cancelled</span>
 
                 <span v-if="!file.finished && !file.failed && !file.cancelled">
                     {{ file.progress }}%
                 </span>
             </div>
+
+            <a href="#" @click.prevent="cancel" v-if="!file.finished && !file.cancelled">Cancel</a>
         </div>
     </div>
 </template>
@@ -36,6 +38,10 @@
                 fileObject.loadedBytes = e.loaded
                 fileObject.totalBytes = e.total
                 fileObject.progress = Math.ceil((e.loaded / e.total) * 100)
+            },
+            cancel() {
+                this.file.xhr()
+                this.file.cancelled = true
             }
         },
 

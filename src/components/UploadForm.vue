@@ -80,10 +80,12 @@
 
                 eventHub.$emit('init')
 
+                var CancelToken = axios.CancelToken
+
                 axios.post('http://fileupload/upload.php', form, {
-                    before: (xhr) => {
-                        fileObject.xhr = xhr
-                    },
+                    cancelToken: new CancelToken(cancel => {
+                        fileObject.xhr = cancel
+                    }),
                     onUploadProgress: (e) => {
                         eventHub.$emit('progress', fileObject, e)
                     }
