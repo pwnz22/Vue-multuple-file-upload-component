@@ -1,7 +1,7 @@
 <template>
     <div class="dragndrop__file">
         <div class="progress">
-            <div class="progress__label">{{ file.file.name }} Filename (x seconds remaining)</div>
+            <div class="progress__label">{{ file.file.name }} Filename ({{ file.secondsRemaining }} seconds remaining)</div>
 
             <div class="progress__fill"
                  :style="{ width: file.progress + '%' }"

@@ -62,7 +62,6 @@
                 this.upload(fileObject)
 
                 return new Promise((resolve, reject) => {
-                    console.log('file', file.name)
                     axios.post('http://fileupload/store.php/', {
                         name: file.name
                     }).then(response => {
@@ -78,6 +77,8 @@
 
                 form.append('file', fileObject.file)
                 form.append('id', fileObject.id)
+
+                eventHub.$emit('init')
 
                 axios.post('http://fileupload/upload.php', form, {
                     before: (xhr) => {
