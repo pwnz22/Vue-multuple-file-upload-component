@@ -4,7 +4,7 @@
             <ul class="list-inline">
                 <li class="list-inline__item">Files: {{ files.length }}</li>
                 <li class="list-inline__item">Percentage: {{ overallProgress }}%</li>
-                <li class="list-inline__item list-inline__item--last">Time remaining: x%</li>
+                <li class="list-inline__item list-inline__item--last">Time remaining: {{ secondsRemaining }}</li>
             </ul>
         </div>
         <file v-for="(file, index) in files" :key="index" :file="file"></file>
@@ -20,18 +20,19 @@
         data () {
             return {
                 overallProgress: 0,
-                interval: null
+                interval: null,
+                secondsRemaining: 0
             }
         },
         props: ['files'],
         components: {File},
         methods: {
             unFinishedFiles() {
-                let i, files = []
+                var i, files = []
 
-                for(i = 0; i < this.files.length; i++) {
+                for (i = 0; i < this.files.length; i++) {
                     if (this.files[i].finished || this.files[i].cancelled) {
-                        //
+                        continue
                     }
                     files.push(this.files[i])
                 }
@@ -39,7 +40,7 @@
                 return files
             },
             updateOverallProgress() {
-                let unfinishedFiles = this.unFinishedFiles(), totalProgress = 0
+                var unfinishedFiles = this.unFinishedFiles(), totalProgress = 0
                 unfinishedFiles.forEach(file => {
                     totalProgress += file.progress
                 })
@@ -48,13 +49,18 @@
 
             },
             updateTimeRemaining() {
+                this.secondsRemaining = 0
+
                 this.unFinishedFiles().forEach(file => {
                     file.secondsRemaining = timeremaining.calculate(
                         file.totalBytes,
                         file.loadedBytes,
                         file.timeStarted
                     )
+
+                    this.secondsRemaining += file.secondsRemaining
                 })
+
             }
         },
         mounted() {
@@ -65,6 +71,11 @@
             eventHub.$on('init', () => {
                 if (!this.interval) {
                     this.interval = setInterval(() => {
+                        if (this.unFinishedFiles().length === 0) {
+                            this.updateOverallProgress()
+                            clearInterval(this.interval)
+                            this.interval = null
+                        }
                         this.updateTimeRemaining()
                     }, 1000)
                 }

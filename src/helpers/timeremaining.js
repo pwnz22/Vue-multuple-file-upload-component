@@ -10,7 +10,7 @@ export default {
         return 0.005 * bytesBySecond + (1 - 0.005) * this.averageSpeed
     },
     calculate(totalBytes, loadedBytes, timeStarted) {
-        let secondsElapsed, bytesBySecond
+        var secondsElapsed, bytesBySecond
 
         if (!totalBytes || !loadedBytes) {
             return 0

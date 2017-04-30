@@ -119,7 +119,7 @@
 
     .dragndrop {
         min-height: $dragndrop-min-height;
-        widows: 100%;
+        width: 100%;
         background-color: #f8f8f8;
         position: relative;
         border: 3px dashed rgba(0, 0, 0, .2);
